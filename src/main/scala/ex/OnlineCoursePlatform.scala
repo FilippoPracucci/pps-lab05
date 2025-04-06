@@ -17,14 +17,14 @@ object Course:
   private case class CourseImpl(override val courseId: String, override val title: String,
                                 override val instructor: String, override val category: String) extends Course
 
-trait Student:
+trait Enrollment:
   def studentId: String
   def courses: Sequence[Course]
 
-object Student:
-  def apply(studentId: String, courses: Sequence[Course]): Student =
-    StudentImpl(studentId, courses)
-  private case class  StudentImpl(override val studentId: String, override val courses: Sequence[Course]) extends Student
+object Enrollment:
+  def apply(studentId: String, courses: Sequence[Course]): Enrollment =
+    EnrollmentImpl(studentId, courses)
+  private case class  EnrollmentImpl(override val studentId: String, courses: Sequence[Course]) extends Enrollment
 
 /**
  * Manages courses and student enrollments on an online learning platform.
@@ -101,9 +101,9 @@ object OnlineCoursePlatform:
   // Factory method for creating an empty platform instance
   def apply(): OnlineCoursePlatform = OnlineCoursePlatformImpl(Sequence(), Sequence()) // Fill Here!
 
-  private class OnlineCoursePlatformImpl(private var _courses: Sequence[Course],private var _students: Sequence[Student]) extends OnlineCoursePlatform:
+  private class OnlineCoursePlatformImpl(private var _courses: Sequence[Course], private var _enrollments: Sequence[Enrollment]) extends OnlineCoursePlatform:
     override def addCourse(course: Course): Unit =
-      _courses = _courses.concat(Sequence(course))
+      _courses = _courses.add(course)
 
     override def findCoursesByCategory(category: String): Sequence[Course] =
       _courses.filter(_.category == category)
@@ -112,29 +112,27 @@ object OnlineCoursePlatform:
       _courses.find(_.courseId == courseId)
 
     override def removeCourse(course: Course): Unit =
-      _courses = _courses.filter(_ != course)
+      _courses = _courses.remove(course)
 
     override def isCourseAvailable(courseId: String): Boolean =
       _courses.map(_.courseId).contains(courseId)
 
     override def enrollStudent(studentId: String, courseId: String): Unit =
-      val courses = _students.filter(_.studentId == studentId).flatMap(_.courses).concat(Sequence(getCourse(courseId).orElse(null)))
-      _students = _students.filter(_.studentId != studentId)
-      _students = _students.concat(Sequence(Student(studentId, courses)))
+      val courses = _enrollments.filter(_.studentId == studentId).flatMap(_.courses).add(getCourse(courseId).orElse(null))
+      _enrollments = _enrollments.filter(_.studentId != studentId).add(Enrollment(studentId, courses))
 
 
     override def unenrollStudent(studentId: String, courseId: String): Unit =
-      val courses = _students.filter(_.studentId == studentId).flatMap(_.courses).filter(_ != getCourse(courseId).orElse(null))
-      _students = _students.filter(_.studentId != studentId)
-      _students = _students.concat(Sequence(Student(studentId, courses)))
+      val courses = _enrollments.filter(_.studentId == studentId).flatMap(_.courses).filter(_ != getCourse(courseId).orElse(null))
+      _enrollments = _enrollments.filter(_.studentId != studentId).add(Enrollment(studentId, courses))
 
     override def getStudentEnrollments(studentId: String): Sequence[Course] =
-      _students.filter(_.studentId == studentId).flatMap(_.courses)
+      _enrollments.filter(_.studentId == studentId).flatMap(_.courses)
 
     override def isStudentEnrolled(studentId: String, courseId: String): Boolean =
-      _students.filter(_.studentId == studentId).flatMap(_.courses).contains(getCourse(courseId).orElse(null))
+      _enrollments.filter(_.studentId == studentId).flatMap(_.courses).contains(getCourse(courseId).orElse(null))
 
-    override def toString: String = s"Courses: ${_courses.map(_.courseId)}; Enrollments: $_students"
+    override def toString: String = s"Courses: ${_courses.map(_.courseId)}; Enrollments: $_enrollments"
 
 /**
  * Represents an online learning platform that offers courses and manages student enrollments.
