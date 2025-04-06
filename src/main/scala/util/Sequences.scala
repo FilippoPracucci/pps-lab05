@@ -52,14 +52,6 @@ object Sequences: // Essentially, generic linkedlists
         case Cons(h, t) => t.reverse().concat(Cons(h, Nil()))
         case _ => Nil()
 
-      def distinct(): Sequence[A] =
-        @annotation.tailrec
-        def _dist(s: Sequence[A], singulars: Sequence[A]): Sequence[A] = s match
-          case Cons(h, t) if !singulars.contains(h) => _dist(t, Cons(h, singulars))
-          case Cons(_, t) => _dist(t, singulars)
-          case _ => singulars.reverse()
-        _dist(sequence, Nil())
-
       def add(e: A): Sequence[A] = sequence.concat(Sequence(e))
 
       def remove(e: A): Sequence[A] = sequence.filter(_ != e)
