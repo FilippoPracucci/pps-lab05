@@ -8,7 +8,7 @@ import scala.annotation.tailrec
 import scala.util.Random
 import scala.jdk.javaapi.OptionConverters
 
-case class Cell(x: Int, y: Int)
+case class Pair(x: Int, y: Int)
 
 trait Logics:
   def size: Int
@@ -28,35 +28,36 @@ object Logics:
 
   /** solution and descriptions at https://bitbucket.org/mviroli/oop2019-esami/src/master/a01b/sol2/ */
   private class LogicsImpl(override val size: Int, override val mines: Int) extends Logics:
-    private var _cells: Sequence[Cell] = Sequence()
-    private var _mines: Sequence[Cell] = Sequence()
+    private var _cells: Sequence[Pair] = Sequence()
+    private var _mines: Sequence[Pair] = Sequence()
 
     for
       i <- 0 until size
       j <- 0 until size
-    do _cells = _cells.concat(Sequence(Cell(i, j)))
+    do _cells = _cells.concat(Sequence(Pair(i, j)))
 
-    private var _m = Cell(-1, -1)
+    private var _m = Pair(-1, -1)
     for
       i <- 0 until mines
     do
-      while (_mines.contains(_m) || _m == Cell(-1, -1))
-        _m = Cell(Random.nextInt(size), Random.nextInt(size))
+      while (_mines.contains(_m) || _m == Pair(-1, -1))
+        _m = Pair(Random.nextInt(size), Random.nextInt(size))
       _mines = _mines.concat(Sequence(_m))
     println(_mines)
 
     def hit(x: Int, y: Int): java.util.Optional[Integer] =
-      if _mines.contains(Cell(x, y)) then
+      if _mines.contains(Pair(x, y)) then
           OptionToOptional(ScalaOptional.Empty())
       else
-        _cells = _cells.remove(Cell(x, y))
-        OptionToOptional(ScalaOptional.Just(neighborsMines(Cell(x, y))))
+        _cells = _cells.remove(Pair(x, y))
+        OptionToOptional(ScalaOptional.Just(neighborsMines(Pair(x, y))))
 
     def won = _cells.size() == _mines.size()
 
-    private def neighborsMines(cell: Cell): Int =
-      _cells.filter(c => (c.x == cell.x + 1 && c.y == cell.y) || (c.x == cell.x - 1 && c.y == cell.y) ||
-        (c.x == cell.x && c.y == cell.y + 1) || (c.x == cell.x && c.y == cell.y - 1) ||
-        (c.x == cell.x + 1 && c.y == cell.y + 1) || (c.x == cell.x + 1 && c.y == cell.y - 1) ||
-        (c.x == cell.x - 1 && c.y == cell.y + 1) || (c.x == cell.x - 1 && c.y == cell.y - 1))
-        .filter(c => _mines.contains(c)).size()
+    private def neighborsMines(cell: Pair): Int =
+      var _neighbors: Sequence[Pair] = Sequence()
+      for
+        i <- (cell.x - 1) to (cell.x + 1)
+        j <- (cell.y - 1) to (cell.y + 1)
+      do _neighbors = _neighbors.add(Pair(i, j))
+      _cells.filter(c => _neighbors.contains(c) && _mines.contains(c)).size()
