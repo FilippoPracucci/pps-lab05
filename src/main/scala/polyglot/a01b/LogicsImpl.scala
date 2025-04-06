@@ -34,7 +34,7 @@ object Logics:
     for
       i <- 0 until size
       j <- 0 until size
-    do _cells = _cells.concat(Sequence(Pair(i, j)))
+    do _cells = _cells.add(Pair(i, j))
 
     private var _m = Pair(-1, -1)
     for
@@ -42,7 +42,7 @@ object Logics:
     do
       while (_mines.contains(_m) || _m == Pair(-1, -1))
         _m = Pair(Random.nextInt(size), Random.nextInt(size))
-      _mines = _mines.concat(Sequence(_m))
+      _mines = _mines.add(_m)
     println(_mines)
 
     def hit(x: Int, y: Int): java.util.Optional[Integer] =
@@ -59,5 +59,7 @@ object Logics:
       for
         i <- (cell.x - 1) to (cell.x + 1)
         j <- (cell.y - 1) to (cell.y + 1)
+        if (i >= 0) && (i < size) && (j >= 0) && (j < size)
+        if (i, j) != (cell.x, cell.y)
       do _neighbors = _neighbors.add(Pair(i, j))
       _cells.filter(c => _neighbors.contains(c) && _mines.contains(c)).size()
