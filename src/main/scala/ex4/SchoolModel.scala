@@ -6,7 +6,6 @@ object SchoolModel:
 
   trait Teacher:
     def name: String
-    override def toString: String = s"$name"
 
   object Teacher:
     def apply(name: String): Teacher = TeacherImpl(name)
@@ -14,7 +13,6 @@ object SchoolModel:
 
   trait Course:
     def name: String
-    override def toString: String = s"$name"
 
   object Course:
     def apply(name: String): Course = CourseImpl(name)
@@ -30,7 +28,6 @@ object SchoolModel:
     def teacherToCourse: Sequence[TeacherToCourse]
     def teacherToCourse_=(teacherToCourse: Sequence[TeacherToCourse]): Unit
 
-    override def toString: String = s"$teacherToCourse"
     extension (school: School)
       /**
        * This method should return a new school with the teacher assigned to the course
@@ -82,12 +79,10 @@ object SchoolModel:
       import Sequence.*
 
       override def teachers: Sequence[Teacher] = _teachers
-      override def teachers_=(teachers: Sequence[Teacher]): Unit =
-        _teachers = teachers
+      override def teachers_=(teachers: Sequence[Teacher]): Unit = _teachers = teachers
 
       override def courses: Sequence[Course] = _courses
-      override def courses_=(courses: Sequence[Course]): Unit =
-        _courses = courses
+      override def courses_=(courses: Sequence[Course]): Unit = _courses = courses
 
       override def teacherToCourse: Sequence[TeacherToCourse] = _teacherToCourse
       override def teacherToCourse_=(teacherToCourse: Sequence[TeacherToCourse]): Unit =
@@ -95,9 +90,9 @@ object SchoolModel:
 
       extension (school: School)
         def setTeacherToCourse(teacher: Teacher, course: Course): School =
-          if !_teachers.contains(teacher) then this.teachers = _teachers.concat(Sequence(teacher))
-          if !_courses.contains(course) then this.courses = _courses.concat(Sequence(course))
-          this.teacherToCourse = _teacherToCourse.concat(Sequence(TeacherToCourse(teacher, course)))
+          if !_teachers.contains(teacher) then this.teachers = _teachers.add(teacher)
+          if !_courses.contains(course) then this.courses = _courses.add(course)
+          this.teacherToCourse = _teacherToCourse.add(TeacherToCourse(teacher, course))
           this
 
         def coursesOfATeacher(teacher: Teacher): Sequence[Course] =
