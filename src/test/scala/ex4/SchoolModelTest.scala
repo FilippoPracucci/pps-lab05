@@ -1,8 +1,8 @@
-package ex
+package ex4
 
 import org.junit.*
 import org.junit.Assert.*
-import SchoolModel.*
+import ex4.SchoolModel.*
 import util.Sequences.*
 import Sequence.*
 
