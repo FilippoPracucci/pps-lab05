@@ -52,7 +52,9 @@ object Sequences: // Essentially, generic linkedlists
         case Cons(h, t) => t.reverse().concat(Cons(h, Nil()))
         case _ => Nil()
 
-      def add(e: A): Sequence[A] = sequence.concat(Sequence(e))
+      def add(e: A): Sequence[A] = sequence match
+        case Cons(h, t) => Cons(h, t.add(e))
+        case _ => Cons(e, Nil())
 
       def remove(e: A): Sequence[A] = sequence.filter(_ != e)
 
